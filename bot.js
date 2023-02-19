@@ -10,7 +10,7 @@ const prefix = 's#';
 const Schema = require('./models/welcomeChannel');
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://SUtilBotUser:ssinha%401125@sutilbot-beta.2ecbj.mongodb.net/?retryWrites=true&w=majority";
+const uri = "";
 const mongo = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1});
 mongo.connect(err => {
   const collection = mongo.db("test").collection("devices");
@@ -43,7 +43,7 @@ client.config = config;
 require('http').createServer((req, res) => res.end('Ready.')).listen(3000)
 
 // Getting the bot token:
-const AuthenticationToken = process.env.DJS_TOKEN || "NzU2NTM4NDY5MTA2NTgxNTU0.GAZDj-.hhQgGXjL8jDrZg9ZTPBF577dLBgtjvyCH9ocO4";
+const AuthenticationToken = process.env.DJS_TOKEN || "";
 if (!AuthenticationToken) {
   console.warn("[CRASH] Authentication Token for Discord bot is required! Use Envrionment Secrets or config.json.".red + "\n")
   process.exit();
