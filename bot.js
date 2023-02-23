@@ -1,4 +1,4 @@
-﻿const { Discord, Client, Partials, Collection, GatewayIntentBits } = require('discord.js');
+﻿const { Discord, Client, Partials, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
 const ytdl = require('ytdl-core');
 const colors = require("colors");
 const { Player } = require('discord-player');
@@ -27,7 +27,9 @@ const client = new Client({
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates
   ],
   partials: [
     Partials.Channel,
@@ -196,11 +198,8 @@ fs.readdir('./commands',(err,files) =>{
     client.commands.set(sss.help,sss)
   })
   })
+  
 
-  client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-      
-    });
     client.on("messageCreate", async message => {
       if(message.author.client) return;
       if(message.channel.type === "dm") return;
@@ -217,8 +216,7 @@ fs.readdir('./commands',(err,files) =>{
   });
   const core = fs.readdirSync('./commands/core').filter(file => file.endsWith('.js'));
   const infos = fs.readdirSync('./commands/infos').filter(file => file.endsWith('.js'));
-  const music = fs.readdirSync('./commands/music').filter(file => file.endsWith('.js'));
-  
+
   
   
   for (const file of core) {
@@ -233,36 +231,28 @@ fs.readdir('./commands',(err,files) =>{
       client.commands.set(command.name.toLowerCase(), command);
   };
   
-  for (const file of music) {
-      console.log(`Loading command ${file}`);
-      const command = require(`./commands/music/${file}`);
-      client.commands.set(command.name.toLowerCase(), command);
-  };
-  
+
   const events = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-  const player = fs.readdirSync('./player').filter(file => file.endsWith('.js'));
   
   for (const file of events) {
       console.log(`Loading discord.js event ${file}`);
       const event = require(`./events/${file}`);
       client.on(file.split(".")[0], event.bind(null, client));
   };
+
   
-  for (const file of player) {
-      console.log(`Loading discord-player event ${file}`);
-      const event = require(`./player/${file}`);
-      client.on(file.split(".")[0], event.bind(null, client));
-  };
-  
-  
-  
+
+
+
   client.once('ready', async () => {
           console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity(`s#help in ${client.guilds.cache.size} servers.`, {type: "WATCHING"});
+  client.user.setPresence({
+  	  activities: [{ name: `s#help in ${client.guilds.cache.size} servers.`, type: ActivityType.Watching }],
+  	  status: 'online',
+});
   });
-  client.once('ready', () => {
-       console.log("Connected as " +client.user.tag);
-  });
+
+
 // Login to the bot:
 client.login(AuthenticationToken)
   .catch((err) => {
@@ -275,3 +265,57 @@ client.login(AuthenticationToken)
 process.on('unhandledRejection', async (err) => {
   console.log(`[ANTI-CRASH] Unhandled Rejection: ${err}`.red)
 })
+/*let ls=0;
+client.on("message", msg => {
+    if (msg.content === "chaton") {
+        ls=1;
+        message.reply('ChatBot On')
+    }
+  })
+
+  client.on("message", msg => {
+    if (msg.content === "chatoff") {
+      ls=0;
+      message.reply('ChatBot Off')
+    }
+  })
+
+  if (!(ls=0)) {     
+        require('dotenv').config();
+  const { Configuration, OpenAIApi } = require("openai");
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
+  let prompt =`SUtilBot is a chatbot that reluctantly answers questions.\n\
+You: How many pounds are in a kilogram?\n\
+Marv: This again? There are 2.2 pounds in a kilogram. Please make a note of this.\n\
+You: What does HTML stand for?\n\
+Marv: Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.\n\
+You: When did the first airplane fly?\n\
+Marv: On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they'd come and take me away.\n\
+You: What is the meaning of life?\n\
+Marv: I'm not sure. I'll ask my friend Google.\n\
+You: hey whats up?\n\
+Marv: Nothing much. You?\n`;
+
+  client.on("messageCreate", function(message) {
+    if (message.author.bot) return;
+    prompt += `You: ${message.content}\n`;
+   (async () => {
+         const gptResponse = await openai.createCompletion({
+             model: "text-davinci-002",
+             prompt: prompt,
+             max_tokens: 60,
+             temperature: 0.3,
+             top_p: 0.3,
+             presence_penalty: 0,
+             frequency_penalty: 0.5,
+           });
+         message.reply(`${gptResponse.data.choices[0].text.substring(5)}`);
+         prompt += `${gptResponse.data.choices[0].text}\n`;
+     })();                          
+    })
+}
+
+*/
